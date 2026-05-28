@@ -19,8 +19,8 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Grant execute permission to Gradle wrapper
-        run: chmod +x gradlew
+      - name: Install Gradle (system)
+        uses: gradle/actions/setup-gradle@v3
 
       - name: Cache Gradle
         uses: actions/cache@v4
@@ -30,15 +30,13 @@ jobs:
             ~/.gradle/wrapper
           key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
 
-      # ⚡ STEP 1: compile only
-      - name: Compile Java classes
-        run: ./gradlew classes
+      # ⚡ USE SYSTEM GRADLE COMMAND (NOT ./gradlew)
+      - name: Compile classes
+        run: gradle classes
 
-      # ⚡ STEP 2: remap to Minecraft runtime
-      - name: Remap JAR (Fabric Loom)
-        run: ./gradlew remapJar
+      - name: Build remapped jar
+        run: gradle remapJar
 
-      # 📦 Upload final mod jar
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
